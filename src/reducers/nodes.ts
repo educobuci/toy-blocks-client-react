@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import initialState from "./initialState";
-import { Node } from "../types/Node";
+import { Block, Node } from "../types/Node";
 import { RootState } from "../store/configureStore";
 import fetch from "cross-fetch";
 
@@ -27,6 +27,18 @@ export const checkNodesStatus = createAsyncThunk(
   }
 );
 
+export const loadNodeBlocks = createAsyncThunk(
+  "nodes/loadNodeBlocks",
+  async (node: Node) => {
+    const response = await fetch(`${node.url}/api/v1/blocks`);
+    const data: Block[] = (await response.json()).data.map((jsonBlock: any) => ({
+      index: jsonBlock.attributes.index,
+      data: jsonBlock.attributes.data,
+    }))
+    return data;
+  }
+);
+
 export const nodesSlice = createSlice({
   name: "nodes",
   initialState: initialState().nodes as NodesState,
@@ -49,6 +61,23 @@ export const nodesSlice = createSlice({
       if (node) {
         node.online = false;
         node.loading = false;
+      }
+    });
+    builder.addCase(loadNodeBlocks.pending, (state, action) => {
+      const node = state.list.find((n) => n.url === action.meta.arg.url);
+      if (node) node.loadingBlocks = true;
+    });
+    builder.addCase(loadNodeBlocks.fulfilled, (state, action) => {
+      const node = state.list.find((n) => n.url === action.meta.arg.url);
+      if (node) {
+        node.loadingBlocks = false;
+        node.blocks = action.payload;
+      }
+    });
+    builder.addCase(loadNodeBlocks.rejected, (state, action) => {
+      const node = state.list.find((n) => n.url === action.meta.arg.url);
+      if (node) {
+        node.loadingBlocks = false;
       }
     });
   },

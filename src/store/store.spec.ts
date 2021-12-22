@@ -1,6 +1,6 @@
 import { AnyAction, configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { ThunkMiddleware } from "redux-thunk";
-import nodesReducer, { checkNodeStatus, NodesState } from "../reducers/nodes";
+import nodesReducer, { checkNodeStatus, loadNodeBlocks, NodesState } from "../reducers/nodes";
 
 describe("Store", () => {
   const nodes = {
@@ -72,14 +72,18 @@ describe("Store", () => {
         type: checkNodeStatus.fulfilled.type,
         meta: { arg: nodes.list[0] },
         payload: { node_name: "theta" },
-      },
+      },{
+        type: loadNodeBlocks.fulfilled.type,
+        meta: { arg: nodes.list[0] },
+        payload: [{ index: 1, data: 'data' }]
+      }
     ];
     actions.forEach((action) => store.dispatch(action));
 
     const actual = store.getState();
     const expected = {
       list: [
-        { url: "a.com", online: true, name: "theta", loading: false },
+        { url: "a.com", online: true, name: "theta", loading: false, loadingBlocks: false, blocks: [{ index: 1, data: 'data' }] },
         { url: "b.com", online: true, name: "epsilon", loading: false },
         { url: "c.com", online: true, name: "delta", loading: false },
         { url: "d.com", online: false, name: "", loading: false },

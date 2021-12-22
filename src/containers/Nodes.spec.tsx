@@ -23,6 +23,13 @@ describe("<Nodes />", () => {
         name: "Node 2",
         loading: false,
       },
+      {
+        url: "https://calm-anchorage-82141.herokuapp.com",
+        online: true,
+        name: "Node 3",
+        loading: false,
+        blocks: [{ index: 1, data: 'data' }]
+      },
     ],
   };
 
@@ -45,7 +52,7 @@ describe("<Nodes />", () => {
   it("should contain <Node />", () => {
     const wrapper = mount(setup());
 
-    expect(wrapper.find(Node).length).toEqual(2);
+    expect(wrapper.find(Node).length).toEqual(3);
     expect(store.getActions()).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

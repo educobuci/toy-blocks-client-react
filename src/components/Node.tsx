@@ -59,7 +59,48 @@ const TypographySecondaryHeading = styled(Typography)(({ theme }) => ({
   lineHeight: 2,
 }));
 
+const Block = styled(Box)({
+  backgroundColor: "#0000001F",
+  display: "flex",
+  flexDirection: "column",
+  padding: 8,
+});
+
+const BlockIndex = styled(Typography)({
+  fontSize: 10,
+  color: "#304FFE",
+});
+
+const BlockData = styled(Typography)({
+  fontSize: 14,
+});
+
+const BlocksContainer = styled(Box)({
+  display: "grid",
+  gap: 8,
+})
+
+const Loading = styled(Typography)({
+  fontSize: 14,
+  padding: 16,
+  textAlign: 'center',
+});
+
+const Error = styled(Typography)({
+  fontSize: 14,
+  padding: 16,
+  color: colors.danger,
+  textAlign: 'center',
+});
+
+
 const Node: React.FC<Props> = ({ node, expanded, toggleNodeExpanded }) => {
+  const formatIndex = React.useCallback((index: number) => {
+    return String(index).padStart(3, '0');
+  }, []);
+
+  const errored = !node.loading && !node.blocks
+
   return (
     <AccordionRoot
       elevation={3}
@@ -80,7 +121,16 @@ const Node: React.FC<Props> = ({ node, expanded, toggleNodeExpanded }) => {
         </BoxSummaryContent>
       </AccordionSummaryContainer>
       <AccordionDetails>
-        <Typography>Blocks go here</Typography>
+        <BlocksContainer>
+          { node.loadingBlocks && <Loading>Loading...</Loading> }
+          { node.blocks?.map(node =>
+            <Block key={node.index}>
+              <BlockIndex>{formatIndex(node.index)}</BlockIndex>
+              <BlockData>{node.data}</BlockData>
+            </Block>
+          )}
+          { errored && <Error>ERROR LOADING BLOCKS</Error>}
+        </BlocksContainer>
       </AccordionDetails>
     </AccordionRoot>
   );
