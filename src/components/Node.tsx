@@ -99,7 +99,7 @@ const Node: React.FC<Props> = ({ node, expanded, toggleNodeExpanded }) => {
     return String(index).padStart(3, '0');
   }, []);
 
-  const errored = !node.loading && !node.blocks
+  const errored = React.useMemo(() => !node.loadingBlocks && !node.blocks, [node.blocks, node.loadingBlocks])
 
   return (
     <AccordionRoot
